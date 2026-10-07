@@ -5,7 +5,7 @@
     "accentColor": "#E8C66A",
     "iconColor": "auto",
     "textColor": "auto",
-    "waveStyle": "static",
+    "waveStyle": "reduced",
     "layout": null,
     "source": {
         "type": "user-created",
@@ -13,7 +13,7 @@
         "firmware": null
     },
     "created": "2026-10-07",
-    "waveDesign": "ECHO_RINGS",
+    "waveDesign": "ECHO_ARCS",
     "gameBootStyle": "LENS",
     "launchDiscStyle": "DISC",
     "buttonSet": "NINTENDO"

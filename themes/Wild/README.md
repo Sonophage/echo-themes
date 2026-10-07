@@ -1,16 +1,20 @@
 ---
 name: Wild
 author: ECHO
-version: 1.0
-description: Slate tiles with cyan edges and gold selection over a dusk-green field. Inspired by open-world adventure menus.
-tags: dark, fantasy, adventure, full theme
+version: 2.0
+description: Slate tiles with cyan edges over a dusk valley under a snow peak. Inspired by open-world adventure menus.
+tags: dusk, adventure, landscape, full theme
 ---
 
 # Wild
 
-- **Icons**: crossbar, menu and status icons, plus all 40 console icons. The primary item in each set is highlighted.
-- **Wallpaper**: still only.
-- **Sounds**: 8 short synthesized UI sounds.
-- **theme.json**: accent #E8C66A, NINTENDO buttons.
+Dark slate tiles with glowing cyan line icons and corner brackets, over a painted dusk: a snow-capped
+peak, a low sun and rolling green hills.
 
-Original art; no official logos or game assets. Not included: menu music, Boot and GameStart media, motion wallpaper. ECHO falls back to its defaults for these.
+- **Icons**: every crossbar, menu and status icon on a slate tile, and a tile for every console.
+- **Wallpaper**: the dusk valley.
+- **Sounds**: 8 short interface sounds.
+- **theme.json**: gold accent, Echo Arcs wave, Lens GameBoot, Disc launch, Nintendo buttons.
+
+Original art, made for ECHO in the spirit of open-world adventure menus. No Nintendo artwork or logos are
+included.
