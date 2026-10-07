@@ -1,5 +1,5 @@
 # checks a theme folder against ECHO's own slot lists and media limits; prints problems, exit 1 if any
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, wave
 from PIL import Image
 repo, theme = sys.argv[1], sys.argv[2]
 kit = f"{repo}/core/theme-kit/src/main/kotlin/com/echo/themekit"
@@ -12,6 +12,24 @@ limits = open(f"{kit}/UiMediaLimits.kt").read()
 const = {k: int(v.replace("_", "")) for k, v in re.findall(r'const val (\w+_MS)\s*=\s*([\d_]+)L', limits)}
 spec = {k: v for k, v in re.findall(r'val (\w+)\s*= ?Spec\(Kind\.\w+,\s*[\d_]+L,\s*[\d_]+L,\s*(\w+)', limits)}
 slot_spec = dict(re.findall(r'\("([a-z_]+)", UiMediaKind\.\w+, "[^"]*", UiMediaLimits\.(\w+)\)', open(f"{repo}/core/core-domain/src/main/kotlin/com/echo/core/domain/model/UiMediaSlot.kt").read()))
+# a sound's length: WAV through the standard library, MP3/OGG/M4A/MP4 through mutagen, anything else through
+# ffprobe when it is installed; 0 when none can read it
+def duration_ms(path):
+    if path.lower().endswith(".wav"):
+        try:
+            with wave.open(path) as w: return w.getnframes() / w.getframerate() * 1000
+        except Exception: return 0
+    try:
+        import mutagen
+        info = mutagen.File(path)
+        if info is not None and info.info.length: return info.info.length * 1000
+    except ImportError: pass
+    except Exception: return 0
+    try:
+        out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path], capture_output=True, text=True).stdout
+        return float(out or 0) * 1000
+    except FileNotFoundError: return 0
+
 problems, kept = [], 0
 def bad(m): problems.append(m)
 m = json.load(open(f"{theme}/theme.json"))
@@ -30,7 +48,7 @@ for root, _, files in os.walk(theme):
             if f not in ("wallpaper.png", "preview.png") and not re.fullmatch(r"motion\.(mp4|webm|gif)", f): bad(f"{rel}: not a wallpaper file ECHO reads"); continue
         elif parts[0] in folder_of.values():
             if media.get(stem) is None or folder_of[media[stem]] != parts[0] or ext not in ("mp3", "wav", "ogg", "m4a", "mp4", "webm"): bad(f"{rel}: not a media slot of {parts[0]}"); continue
-            ms = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", os.path.join(root, f)], capture_output=True, text=True).stdout or 0) * 1000
+            ms = duration_ms(os.path.join(root, f))
             hard = const[spec[slot_spec[stem]]]
             if ms <= 0: bad(f"{rel}: no duration")
             elif ms > hard: bad(f"{rel}: {ms:.0f} ms, over the {hard} ms limit")

@@ -24,7 +24,10 @@ jobs:
           sparse-checkout: |
             core/theme-kit/src/main
             core/core-domain/src/main/kotlin/com/echo/core/domain/model/UiMediaSlot.kt
-      - run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg && pip install pillow
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow mutagen
       - name: Check every theme
         run: |
           status=0
