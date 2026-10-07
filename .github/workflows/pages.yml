@@ -1,0 +1,47 @@
+# Checks every theme against ECHO's own slot lists and limits, then publishes the store's site on GitHub Pages
+name: Publish the theme store
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Sonophage/echo-launcher
+          path: echo-launcher
+          sparse-checkout: |
+            core/theme-kit/src/main
+            core/core-domain/src/main/kotlin/com/echo/core/domain/model/UiMediaSlot.kt
+      - run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg && pip install pillow
+      - name: Check every theme
+        run: |
+          status=0
+          for t in themes/*/; do python3 -I tools/check_theme.py echo-launcher "$t" || status=1; done
+          exit $status
+      - run: python3 -I tools/build_catalog.py themes dist
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

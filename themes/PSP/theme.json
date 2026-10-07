@@ -1,0 +1,20 @@
+{
+    "manifest": "echo-theme",
+    "schemaVersion": 3,
+    "name": "PSP",
+    "accentColor": "#B04AA8",
+    "iconColor": "auto",
+    "textColor": "auto",
+    "waveStyle": "static",
+    "layout": null,
+    "source": {
+        "type": "user-created",
+        "file": null,
+        "firmware": null
+    },
+    "created": "2026-10-07",
+    "waveDesign": "ECHO_RINGS",
+    "gameBootStyle": "LENS",
+    "launchDiscStyle": "DISC",
+    "buttonSet": "PLAYSTATION"
+}
