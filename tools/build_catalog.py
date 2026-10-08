@@ -1,5 +1,5 @@
 # builds the site the ECHO theme store reads: dist/index.json, one zip per theme folder, and each theme's
-# README.md and Preview/ for its store page. ECHO reads the zips through its own theme-folder reader, so this
+# README.md, Preview/ and still wallpaper for its store page. ECHO reads the zips through its own theme-folder reader, so this
 # script only packs files; it does not interpret the theme format.
 import hashlib, json, os, shutil, sys, urllib.parse, zipfile
 
@@ -22,6 +22,13 @@ for name in sorted(os.listdir(themes_dir)):
     entry = {"id": name, "name": name, "archive": q(f"themes/{name}.zip"), "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
     if os.path.isfile(f"{src}/README.md"):
         shutil.copy(f"{src}/README.md", page); entry["readme"] = q(f"themes/{name}/README.md")
+    # the theme's own still wallpaper, shown behind its store page instead of a screenshot (owner, 2026-10-07)
+    walls = f"{src}/Wallpaper"
+    if os.path.isdir(walls):
+        still = next((f for f in sorted(os.listdir(walls)) if f.lower().startswith("wallpaper.") and f.lower().rsplit(".", 1)[-1] in ("png", "jpg", "jpeg", "webp")), None)
+        if still:
+            os.makedirs(f"{page}/Wallpaper"); shutil.copy(f"{walls}/{still}", f"{page}/Wallpaper/{still}")
+            entry["wallpaper"] = q(f"themes/{name}/Wallpaper/{still}")
     preview = f"{src}/Preview"
     if os.path.isdir(preview):
         shutil.copytree(preview, f"{page}/Preview")
