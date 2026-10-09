@@ -36,6 +36,16 @@ m = json.load(open(f"{theme}/theme.json"))
 if m.get("manifest") not in ("echo-theme", "pfptheme"): bad("theme.json: manifest is not echo-theme")
 for key, allowed in [("waveDesign", {"PSP", "ECHO_RINGS", "ECHO_ARCS"}), ("gameBootStyle", {"DISC", "LENS"}), ("launchDiscStyle", {"DISC", "LENS"}), ("buttonSet", {"GENERIC", "XBOX", "NINTENDO", "PLAYSTATION"})]:
     if m.get(key) is not None and m[key] not in allowed: bad(f"theme.json: {key}={m[key]} is not one ECHO knows")
+# look settings: only the keys ThemeSettings.kt lists, true/false or a name as it says, or null
+setting_kinds = dict(re.findall(r'"([a-z0-9_]+)" to Kind\.(BOOL|TEXT)', open(f"{kit}/ThemeSettings.kt").read()))
+if not setting_kinds: bad("could not read ThemeSettings.kt from the echo-launcher checkout")
+settings = m.get("settings") or {}
+if not isinstance(settings, dict): bad("theme.json: settings is not an object"); settings = {}
+for key, value in settings.items():
+    kind = setting_kinds.get(key)
+    if kind is None: bad(f"theme.json: settings.{key} is not a setting a theme can carry")
+    elif value is not None and not (isinstance(value, bool) if kind == "BOOL" else isinstance(value, str)):
+        bad(f"theme.json: settings.{key} must be {'true or false' if kind == 'BOOL' else 'a name'}")
 for root, _, files in os.walk(theme):
     for f in files:
         rel = os.path.relpath(os.path.join(root, f), theme); parts = rel.split(os.sep); stem, ext = os.path.splitext(f); ext = ext[1:].lower()
