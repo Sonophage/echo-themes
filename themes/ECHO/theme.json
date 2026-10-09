@@ -1,7 +1,7 @@
 {
     "manifest": "echo-theme",
     "schemaVersion": 3,
-    "name": "Konker",
+    "name": "ECHO",
     "accentColor": "#D9113A",
     "iconColor": "auto",
     "textColor": "auto",
