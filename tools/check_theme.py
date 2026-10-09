@@ -53,6 +53,11 @@ for key, value in settings.items():
     if kind is None: bad(f"theme.json: settings.{key} is not a setting a theme can carry")
     elif value is not None and not (isinstance(value, bool) if kind == "BOOL" else isinstance(value, str)):
         bad(f"theme.json: settings.{key} must be {'true or false' if kind == 'BOOL' else 'a name'}")
+# a font: the extensions and size EchoThemeCodec takes, one file, with a TrueType or OpenType signature
+codec = open(f"{kit}/EchoThemeCodec.kt").read()
+font_exts = set(re.findall(r'"(\w+)"', re.search(r'FONT_EXTENSIONS = setOf\(([^)]*)\)', codec).group(1)))
+font_mb = int(re.search(r'MAX_FONT_BYTES = (\d+) \* 1024 \* 1024', codec).group(1))
+fonts = 0
 for root, _, files in os.walk(theme):
     for f in files:
         rel = os.path.relpath(os.path.join(root, f), theme); parts = rel.split(os.sep); stem, ext = os.path.splitext(f); ext = ext[1:].lower()
@@ -69,6 +74,13 @@ for root, _, files in os.walk(theme):
             hard = const[spec[slot_spec[stem]]]
             if ms <= 0: bad(f"{rel}: no duration")
             elif ms > hard: bad(f"{rel}: {ms:.0f} ms, over the {hard} ms limit")
+        elif parts[0] == "Fonts":
+            if len(parts) != 2 or ext not in font_exts: bad(f"{rel}: not a font ECHO reads ({', '.join(sorted(font_exts))})"); continue
+            fonts += 1
+            if fonts > 1: bad(f"{rel}: a theme carries one font; ECHO keeps only one of them")
+            path = os.path.join(root, f)
+            if os.path.getsize(path) > font_mb << 20: bad(f"{rel}: over {font_mb} MB")
+            elif open(path, "rb").read(4) not in (b"\x00\x01\x00\x00", b"OTTO", b"true"): bad(f"{rel}: not a TrueType or OpenType font")
         elif parts[0] == "Preview":
             if not ((len(parts) == 2 and stem == "hero") or (len(parts) == 3 and parts[1] == "Screenshots")) or ext not in ("jpg", "jpeg", "png", "webp"): bad(f"{rel}: not a hero or screenshot"); continue
         else:
