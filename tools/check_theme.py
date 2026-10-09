@@ -44,7 +44,10 @@ for key, enum in (("focusStyle", "FocusStyle"), ("motion", "MotionPreset")):
     if not names: bad(f"could not read {enum} from FocusAndMotion.kt")
     elif m.get(key) is not None and m[key] not in names: bad(f"theme.json: {key}={m[key]} is not one ECHO knows")
 # look settings: only the keys ThemeSettings.kt lists, true/false or a name as it says, or null
-setting_kinds = dict(re.findall(r'"([a-z0-9_]+)" to Kind\.(BOOL|TEXT)', open(f"{kit}/ThemeSettings.kt").read()))
+ts = open(f"{kit}/ThemeSettings.kt").read()
+setting_kinds = dict(re.findall(r'"([a-z0-9_]+)" to Kind\.(BOOL|TEXT)', ts))
+# the names a text setting may take (ThemeSettings.CHOICES); ECHO drops any other
+choices = {k: set(re.findall(r'"(\w+)"', v)) for k, v in re.findall(r'"([a-z0-9_]+)" to setOf\(([^)]*)\)', ts)}
 if not setting_kinds: bad("could not read ThemeSettings.kt from the echo-launcher checkout")
 settings = m.get("settings") or {}
 if not isinstance(settings, dict): bad("theme.json: settings is not an object"); settings = {}
@@ -53,6 +56,8 @@ for key, value in settings.items():
     if kind is None: bad(f"theme.json: settings.{key} is not a setting a theme can carry")
     elif value is not None and not (isinstance(value, bool) if kind == "BOOL" else isinstance(value, str)):
         bad(f"theme.json: settings.{key} must be {'true or false' if kind == 'BOOL' else 'a name'}")
+    elif isinstance(value, str) and key in choices and value not in choices[key]:
+        bad(f"theme.json: settings.{key}={value} is not one ECHO knows")
 # a font: the extensions and size EchoThemeCodec takes, one file, with a TrueType or OpenType signature
 codec = open(f"{kit}/EchoThemeCodec.kt").read()
 font_exts = set(re.findall(r'"(\w+)"', re.search(r'FONT_EXTENSIONS = setOf\(([^)]*)\)', codec).group(1)))
