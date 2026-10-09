@@ -36,6 +36,13 @@ m = json.load(open(f"{theme}/theme.json"))
 if m.get("manifest") not in ("echo-theme", "pfptheme"): bad("theme.json: manifest is not echo-theme")
 for key, allowed in [("waveDesign", {"PSP", "ECHO_RINGS", "ECHO_ARCS"}), ("gameBootStyle", {"DISC", "LENS"}), ("launchDiscStyle", {"DISC", "LENS"}), ("buttonSet", {"GENERIC", "XBOX", "NINTENDO", "PLAYSTATION"})]:
     if m.get(key) is not None and m[key] not in allowed: bad(f"theme.json: {key}={m[key]} is not one ECHO knows")
+# focus style and motion: the names in FocusAndMotion.kt's two enums
+fm = open(f"{kit}/FocusAndMotion.kt").read()
+enums = dict(re.findall(r'enum class (\w+) \{([^}]*)\}', fm))
+for key, enum in (("focusStyle", "FocusStyle"), ("motion", "MotionPreset")):
+    names = {n.strip() for n in enums.get(enum, "").split(",") if n.strip()}
+    if not names: bad(f"could not read {enum} from FocusAndMotion.kt")
+    elif m.get(key) is not None and m[key] not in names: bad(f"theme.json: {key}={m[key]} is not one ECHO knows")
 # look settings: only the keys ThemeSettings.kt lists, true/false or a name as it says, or null
 setting_kinds = dict(re.findall(r'"([a-z0-9_]+)" to Kind\.(BOOL|TEXT)', open(f"{kit}/ThemeSettings.kt").read()))
 if not setting_kinds: bad("could not read ThemeSettings.kt from the echo-launcher checkout")
