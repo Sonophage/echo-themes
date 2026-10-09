@@ -1,0 +1,32 @@
+{
+    "manifest": "echo-theme",
+    "schemaVersion": 3,
+    "name": "Konker",
+    "accentColor": "#D9113A",
+    "iconColor": "auto",
+    "textColor": "auto",
+    "waveStyle": "animated",
+    "layout": null,
+    "source": {
+        "type": "user-created",
+        "file": null,
+        "firmware": null
+    },
+    "created": "2026-10-09",
+    "waveDesign": "ECHO_RINGS",
+    "gameBootStyle": "LENS",
+    "launchDiscStyle": "LENS",
+    "buttonSet": "GENERIC",
+    "focusStyle": null,
+    "motion": null,
+    "settings": {
+        "pref_xmb_row_cover_art": true,
+        "display_card_art_grid": true,
+        "pref_animated_icons": true,
+        "pref_xmb_item_backdrop": true,
+        "display_icon_legibility": "NONE",
+        "display_wave_over_wallpaper": true,
+        "display_color_scheme": "BLACK",
+        "display_text_shadow": true
+    }
+}

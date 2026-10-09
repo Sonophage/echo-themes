@@ -23,16 +23,3 @@ Build the site locally:
 ```sh
 python3 tools/build_catalog.py themes dist
 ```
-
-## The first-party themes
-
-ECHO, PSP, Ryoku and Wild are drawn by `tools/art/build_themes.py` (icons, wallpaper and `theme.json`;
-ECHO's sounds too). It needs Pillow, the Noto Serif CJK fonts and an echo-launcher checkout beside this
-repo for ECHO's own font:
-
-```sh
-python3 tools/art/build_themes.py themes ECHO PSP Ryoku Wild
-```
-
-All of their art is original. PSP and Wild are drawn in the spirit of those menus; no Sony or Nintendo
-artwork or logos are included.
